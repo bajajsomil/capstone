@@ -2,6 +2,8 @@
 
 **Capstone Project — AI Practitioner+ Program**
 
+**🔗 Live demo: [capstone-fq7ru8h8e5u9cfnkjmfhvu.streamlit.app](https://capstone-fq7ru8h8e5u9cfnkjmfhvu.streamlit.app/)**
+
 FraudShield is a proof-of-concept fraud detection and prevention tool for insurance claims. It uses an
 LLM as an always-on Special Investigations Unit (SIU) analyst that reviews every claim the moment it's
 filed, scores its fraud risk with specific, evidence-grounded reasoning, and recommends a next action —
@@ -76,6 +78,8 @@ this scale.
 
 ## Setup
 
+The live demo above requires no setup. To run it locally instead:
+
 1. **Requirements:** Python 3.10+.
 2. Install dependencies:
    ```
@@ -101,6 +105,18 @@ this scale.
 Live features (the "Run live AI analysis" buttons, **Submit a New Claim**, and **Fraud Ring Detection**)
 require a valid `GEMINI_API_KEY`; without one, the sidebar shows a warning and those actions display a
 friendly error instead of crashing.
+
+## Testing
+
+```
+pip install -r requirements-dev.txt
+python -m pytest tests/
+```
+
+27 tests cover claim/cache/assessment persistence (`fraudshield/data.py`), UI formatting helpers
+(`fraudshield/ui.py`), and the Gemini client's retry/backoff behavior on rate limits (429) and server
+overload (503) plus response validation (`fraudshield/ai_client.py`) — all against a mocked client, no
+real API calls or network access needed to run the suite.
 
 ## Suggested demo flow
 
