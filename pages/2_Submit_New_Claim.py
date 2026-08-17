@@ -112,8 +112,21 @@ with st.form("new_claim_form"):
     submitted = st.form_submit_button("🛡️ Submit & analyze with AI", width="stretch")
 
 if submitted:
-    if not claimant_name or not incident_description:
-        st.error("Claimant name and incident description are required.")
+    errors = []
+    if not claimant_name.strip():
+        errors.append("Claimant name is required.")
+    if not incident_description.strip():
+        errors.append("Incident description is required.")
+    if claimed_amount <= 0:
+        errors.append("Claimed amount must be greater than $0.")
+    if reported_date < incident_date:
+        errors.append("Reported date can't be before the incident date.")
+    if incident_date < policy_start_date:
+        errors.append("Incident date is before the policy start date — this claim wouldn't be covered.")
+
+    if errors:
+        for err in errors:
+            st.error(err)
     else:
         claim_id = data.next_claim_id()
         claim = {
