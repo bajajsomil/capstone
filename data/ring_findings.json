@@ -1,38 +1,35 @@
 {
   "clusters": [
     {
-      "cluster_name": "Riverside Wellness & Marcus Webb Injury Ring",
+      "cluster_name": "Riverside Wellness & QuickFix Auto Ring",
       "claim_ids": [
         "CLM-1004",
         "CLM-1005",
-        "CLM-1011",
         "CLM-1016"
       ],
       "shared_entities": [
+        "QuickFix Auto Body",
         "Riverside Wellness & Rehab",
         "Marcus Webb, Esq."
       ],
       "risk_level": "High",
-      "explanation": "Multiple claims involving different individuals (Angela Ruiz, Thomas Nguyen, Jerome Watts, Natalie Reyes) are tied together by the exact same medical provider (Riverside Wellness & Rehab) and legal representation (Marcus Webb, Esq.). The cluster exhibits classic soft-tissue injury ring patterns, including repeat claimants, lack of independent witnesses, timeline inconsistencies, and refusal of independent medical examinations."
+      "explanation": "These claims share a distinct organized fraud pattern involving multiple interconnected entities. CLM-1004 and CLM-1005 stem from the exact same incident (driver and passenger) featuring soft-tissue injuries, treatment at Riverside Wellness & Rehab, and representation by attorney Marcus Webb, Esq. CLM-1016 involves the same recurring combination of QuickFix Auto Body, Riverside Wellness & Rehab, and Marcus Webb, Esq. across serial soft-tissue claims. This points to a coordinated medical-legal-repair collusion ring."
     },
     {
-      "cluster_name": "QuickFix Auto Body Inflation and Staged Loss Ring",
+      "cluster_name": "QuickFix Auto Inflated Estimates Cluster",
       "claim_ids": [
         "CLM-1003",
         "CLM-1006",
-        "CLM-1018",
-        "CLM-1019",
-        "CLM-1020",
-        "CLM-1021"
+        "CLM-1018"
       ],
       "shared_entities": [
         "QuickFix Auto Body"
       ],
       "risk_level": "High",
-      "explanation": "A network of claims routed through QuickFix Auto Body displaying severe fraud indicators: highly inflated estimates for minor cosmetic damage (CLM-1006, CLM-1018), suspicious single-vehicle total loss claims with no police reports and immediate towing to the same shop (CLM-1003), and duplicate fraudulent filings requesting fast cash settlements (CLM-1019, CLM-1020, CLM-1021)."
+      "explanation": "Multiple claims are linked through QuickFix Auto Body exhibiting patterns of suspicious inflation or fabrication. CLM-1003 features a vehicle towed directly to QuickFix to avoid immediate inspection following a late-night single-vehicle collision on a newly incepted policy. CLM-1006 and CLM-1018 involve extreme over-estimation relative to actual damage (e.g., quoting full panel replacement for a minor scrape, and claiming major structural frame damage for minor cosmetic scuffing)."
     }
   ],
-  "overall_summary": "Analysis of the claim batch reveals two highly organized fraud rings operating in Springfield. The first is a medical-legal collusion ring centered around Riverside Wellness & Rehab and attorney Marcus Webb, specializing in inflated soft-tissue injury claims. The second is an auto repair fraud ring centered around QuickFix Auto Body, characterized by inflated estimates, staged or poorly documented single-vehicle total losses, and duplicate filings.",
+  "overall_summary": "The analysis identified two major high-risk fraud clusters within the batch. The primary cluster represents a sophisticated medical-legal-repair ring centered around Riverside Wellness & Rehab, Marcus Webb, Esq., and QuickFix Auto Body, exploiting staged or minor motor vehicle accidents for inflated soft-tissue injury and repair claims. A secondary cluster focuses specifically on QuickFix Auto Body for systematically generating grossly inflated or suspicious repair and total loss estimates.",
   "model": "gemini-flash-lite-latest",
-  "generated_at": "2026-08-17T13:30:55.017593+00:00"
+  "generated_at": "2026-08-17T13:47:47.451144+00:00"
 }

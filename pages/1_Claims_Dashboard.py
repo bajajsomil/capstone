@@ -51,10 +51,15 @@ with chart_col1:
     status_colors = {"Low": "#0ca30c", "Medium": "#fab219", "High": "#d03b3b"}
     chart = (
         alt.Chart(risk_counts)
-        .mark_bar(cornerRadiusEnd=4, size=28)
+        .mark_bar(cornerRadiusEnd=4)
         .encode(
             x=alt.X("Count:Q", title="Claims"),
-            y=alt.Y("Risk Level:N", sort=["High", "Medium", "Low"], title=None),
+            y=alt.Y(
+                "Risk Level:N",
+                sort=["High", "Medium", "Low"],
+                title=None,
+                scale=alt.Scale(paddingInner=0.4),
+            ),
             color=alt.Color(
                 "Risk Level:N",
                 scale=alt.Scale(domain=list(status_colors.keys()), range=list(status_colors.values())),
@@ -62,7 +67,7 @@ with chart_col1:
             ),
             tooltip=["Risk Level", "Count"],
         )
-        .properties(height=160, title="Claims by risk level")
+        .properties(height=210, title="Claims by risk level")
     )
     st.altair_chart(chart, width="stretch")
 
@@ -70,10 +75,10 @@ with chart_col2:
     type_amounts = df.groupby("Type", as_index=False)["Claimed Amount"].sum()
     chart2 = (
         alt.Chart(type_amounts)
-        .mark_bar(cornerRadiusEnd=4, size=28)
+        .mark_bar(cornerRadiusEnd=4)
         .encode(
             x=alt.X("Claimed Amount:Q", title="Total claimed ($)"),
-            y=alt.Y("Type:N", sort="-x", title=None),
+            y=alt.Y("Type:N", sort="-x", title=None, scale=alt.Scale(paddingInner=0.4)),
             color=alt.Color(
                 "Type:N",
                 scale=alt.Scale(domain=list(ui.CATEGORICAL.keys()), range=list(ui.CATEGORICAL.values())),
@@ -81,7 +86,7 @@ with chart_col2:
             ),
             tooltip=["Type", "Claimed Amount"],
         )
-        .properties(height=160, title="Claimed amount by type")
+        .properties(height=210, title="Claimed amount by type")
     )
     st.altair_chart(chart2, width="stretch")
 
