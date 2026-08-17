@@ -1,13 +1,13 @@
 import pandas as pd
 import streamlit as st
 
-from fraudshield import claude_client, data, ui
+from fraudshield import ai_client, data, ui
 
 st.set_page_config(page_title="Fraud Ring Detection | FraudShield", page_icon="🕸️", layout="wide")
 ui.inject_base_css()
 st.title("🕸️ Fraud Ring Detection")
 st.caption(
-    "Individual claims can each look only mildly suspicious on their own. Here Claude reviews the "
+    "Individual claims can each look only mildly suspicious on their own. Here Gemini reviews the "
     "entire claims book at once, looking for claims linked by shared repair shops, clinics, "
     "attorneys, or addresses that together suggest an organized or collusive fraud ring."
 )
@@ -18,9 +18,9 @@ findings = data.load_ring_findings()
 col1, col2 = st.columns([3, 1])
 with col2:
     if st.button("🔄 Run live network analysis", width="stretch"):
-        with st.spinner(f"Claude is cross-referencing {len(claims)} claims for shared entities..."):
+        with st.spinner(f"Gemini is cross-referencing {len(claims)} claims for shared entities..."):
             try:
-                findings = claude_client.detect_fraud_rings(claims)
+                findings = ai_client.detect_fraud_rings(claims)
                 data.save_ring_findings(findings)
             except RuntimeError as exc:
                 st.error(str(exc))

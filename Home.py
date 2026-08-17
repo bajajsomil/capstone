@@ -9,7 +9,7 @@ st.markdown(
     """
     <div class="fs-hero">
         <h1>🛡️ FraudShield</h1>
-        <p>Proactive, explainable fraud detection for insurance claims — powered by Claude.</p>
+        <p>Proactive, explainable fraud detection for insurance claims — powered by Gemini.</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -28,7 +28,7 @@ with left:
     )
     st.subheader("What FraudShield does")
     st.write(
-        "FraudShield reviews every claim the moment it's filed, using Claude as a tireless SIU "
+        "FraudShield reviews every claim the moment it's filed, using Gemini as a tireless SIU "
         "analyst that reasons over the full claim narrative — not just a checklist of rules. "
         "Every score comes with **specific, evidence-grounded red flags** and a **recommended "
         "action**, so adjusters can approve genuine claims fast and route suspicious ones to "
@@ -38,7 +38,7 @@ with left:
     st.markdown("##### How it works")
     steps = [
         ("1. Ingest", "A new or existing claim's facts, history, and documentation notes are structured for review."),
-        ("2. Reason", "Claude weighs fraud indicators against mitigating evidence — police reports, witnesses, tenure — the way a senior investigator would."),
+        ("2. Reason", "Gemini weighs fraud indicators against mitigating evidence — police reports, witnesses, tenure — the way a senior investigator would."),
         ("3. Score & explain", "A calibrated 0–100 risk score, a risk tier, and specific red flags are returned as structured data, not a black box."),
         ("4. Decide", "A human adjuster reviews the recommendation — Approve, Request Info, Investigate, or Escalate to SIU — and makes the final call."),
     ]
@@ -66,9 +66,9 @@ with c3:
     st.page_link("pages/3_Fraud_Ring_Detection.py", label="🕸️ Fraud Ring Detection", help="Cross-claim analysis to surface organized fraud networks")
 
 with st.sidebar:
-    st.caption("FraudShield MVP · built on the Claude API")
+    st.caption("FraudShield MVP · built on the Gemini API")
     import os
-    if os.environ.get("ANTHROPIC_API_KEY"):
-        st.success("Claude API key detected", icon="✅")
+    if os.environ.get("GEMINI_API_KEY"):
+        st.success("Gemini API key detected", icon="✅")
     else:
-        st.warning("No ANTHROPIC_API_KEY found — set it in a .env file to enable live analysis.", icon="⚠️")
+        st.warning("No GEMINI_API_KEY found — set it in a .env file to enable live analysis.", icon="⚠️")

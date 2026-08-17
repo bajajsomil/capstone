@@ -2,13 +2,13 @@ from datetime import date, timedelta
 
 import streamlit as st
 
-from fraudshield import claude_client, data, ui
+from fraudshield import ai_client, data, ui
 
 st.set_page_config(page_title="Submit New Claim | FraudShield", page_icon="🆕", layout="wide")
 ui.inject_base_css()
 st.title("🆕 Submit a New Claim")
 st.caption(
-    "Fill out a claim like a policyholder or intake system would. On submit, Claude reviews it "
+    "Fill out a claim like a policyholder or intake system would. On submit, Gemini reviews it "
     "live and returns a full fraud risk assessment in seconds."
 )
 
@@ -109,7 +109,7 @@ with st.form("new_claim_form"):
     incident_description = st.text_area("Incident description", height=120, key="f_incident_description")
     adjuster_notes = st.text_area("Adjuster notes (optional)", height=80, key="f_adjuster_notes")
 
-    submitted = st.form_submit_button("🛡️ Submit & analyze with Claude", width="stretch")
+    submitted = st.form_submit_button("🛡️ Submit & analyze with AI", width="stretch")
 
 if submitted:
     if not claimant_name or not incident_description:
@@ -136,15 +136,15 @@ if submitted:
             "legal_representation": legal_representation or None,
             "adjuster_notes": adjuster_notes or None,
         }
-        with st.spinner("Claude is reviewing the new claim..."):
+        with st.spinner("Gemini is reviewing the new claim..."):
             try:
-                assessment = claude_client.analyze_claim(claim)
+                assessment = ai_client.analyze_claim(claim)
                 data.append_submitted_claim(claim)
                 data.update_cache_entry(claim_id, assessment)
                 st.success(f"Claim {claim_id} submitted and analyzed.")
                 st.divider()
                 st.subheader(f"AI fraud assessment — {claim_id}")
                 ui.render_assessment(assessment)
-                st.page_link("pages/1_Claims_Dashboard.py", label="View this claim on the Claims Dashboard →")
+                st.caption(f"This claim is now saved — find it on the Claims Dashboard as {claim_id}.")
             except RuntimeError as exc:
                 st.error(str(exc))

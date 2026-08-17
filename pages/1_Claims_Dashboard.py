@@ -2,13 +2,13 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from fraudshield import claude_client, data, ui
+from fraudshield import ai_client, data, ui
 
 st.set_page_config(page_title="Claims Dashboard | FraudShield", page_icon="📋", layout="wide")
 ui.inject_base_css()
 st.title("📋 Claims Dashboard")
 st.caption(
-    "Every claim below has already been triaged by Claude. Filter the book, then drill into any "
+    "Every claim below has already been triaged by AI. Filter the book, then drill into any "
     "claim to see the full evidence-based assessment and ask follow-up questions."
 )
 
@@ -146,9 +146,9 @@ else:
             st.info("This claim hasn't been analyzed yet.")
 
         if st.button("🔄 Run / re-run live AI analysis", key=f"analyze_{selected_id}", width="stretch"):
-            with st.spinner("Claude is reviewing the claim file..."):
+            with st.spinner("Gemini is reviewing the claim file..."):
                 try:
-                    new_assessment = claude_client.analyze_claim(claim)
+                    new_assessment = ai_client.analyze_claim(claim)
                     cache = data.update_cache_entry(selected_id, new_assessment)
                     st.rerun()
                 except RuntimeError as exc:
@@ -171,7 +171,7 @@ else:
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     try:
-                        answer = claude_client.ask_about_claim(
+                        answer = ai_client.ask_about_claim(
                             claim, assessment, question, st.session_state[chat_key][:-1]
                         )
                     except RuntimeError as exc:

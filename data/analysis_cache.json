@@ -1,0 +1,371 @@
+{
+  "CLM-1008": {
+    "risk_score": 62,
+    "risk_level": "Medium",
+    "red_flags": [
+      {
+        "flag": "Coverage increase prior to loss",
+        "severity": "High",
+        "explanation": "Policy coverage limits were increased just two weeks prior to the reported water damage incident."
+      },
+      {
+        "flag": "Unlicensed contractor estimate",
+        "severity": "Medium",
+        "explanation": "The repair estimate was provided by an unverified and unlicensed contractor."
+      },
+      {
+        "flag": "Missing initial documentation",
+        "severity": "Low",
+        "explanation": "No photographs of the damaged basement flooring and drywall were provided at the time of initial filing."
+      }
+    ],
+    "summary": "This property claim involves basement water damage reported shortly after a coverage limit increase. Mitigating factors include a long-standing policy history since 2019 and zero prior claims in the last three years. However, the timing of the coverage increase alongside an estimate from an unverified unlicensed contractor and a lack of initial photographic evidence warrants further review.",
+    "recommended_action": "Request More Information",
+    "confidence": 0.85,
+    "claim_id": "CLM-1008",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:15.116054+00:00"
+  },
+  "CLM-1011": {
+    "risk_score": 75,
+    "risk_level": "High",
+    "red_flags": [
+      {
+        "flag": "Inconsistent statements over time",
+        "severity": "High",
+        "explanation": "The initial statement described the incident as occurring in the evening, while a follow-up statement changed the time to the afternoon."
+      },
+      {
+        "flag": "Uncooperative with investigation",
+        "severity": "High",
+        "explanation": "The claimant has declined an independent medical examination twice."
+      },
+      {
+        "flag": "Absence of independent witnesses or police report",
+        "severity": "Medium",
+        "explanation": "There were no witnesses to the slip and fall incident, and no police report was filed."
+      }
+    ],
+    "summary": "This liability claim involves a tenant's guest alleging a slip and fall on an exterior staircase. The file exhibits several high-risk indicators, including conflicting timelines provided by the claimant in subsequent statements, an absence of witnesses or a police report, and a direct refusal to attend an independent medical examination. These factors collectively warrant referral to the Special Investigations Unit.",
+    "recommended_action": "Escalate to SIU",
+    "confidence": 0.9,
+    "claim_id": "CLM-1011",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:30.002493+00:00"
+  },
+  "CLM-1001": {
+    "risk_score": 5,
+    "risk_level": "Low",
+    "red_flags": [],
+    "summary": "This is a straightforward low-speed rear-end collision reported promptly the day after the incident. The claim benefits from strong mitigating evidence, including a long-standing policy history (active since 2020), a zero prior-claim record over the last three years, independent witnesses, an official police report, and a repair estimate verified by the adjuster as consistent with damage photos.",
+    "recommended_action": "Approve",
+    "confidence": 0.98,
+    "claim_id": "CLM-1001",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:25:42.697091+00:00"
+  },
+  "CLM-1002": {
+    "risk_score": 5,
+    "risk_level": "Low",
+    "red_flags": [],
+    "summary": "This is a property claim for a kitchen grease fire submitted by a long-term policyholder with zero prior claims in the last three years. The incident was reported immediately, supported by a fire department incident report, and verified with itemized contractor estimates and photographs.",
+    "recommended_action": "Approve",
+    "confidence": 0.95,
+    "claim_id": "CLM-1002",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:25:46.883200+00:00"
+  },
+  "CLM-1003": {
+    "risk_score": 75,
+    "risk_level": "High",
+    "red_flags": [
+      {
+        "flag": "Early policy inception",
+        "severity": "High",
+        "explanation": "The auto policy was incepted just 9 days prior to the reported incident date."
+      },
+      {
+        "flag": "Missing police report",
+        "severity": "Medium",
+        "explanation": "No police report was filed for a single-vehicle collision resulting in a total loss."
+      },
+      {
+        "flag": "Delayed reporting",
+        "severity": "Medium",
+        "explanation": "There was a 5-day delay between the incident date and the date the claim was reported."
+      },
+      {
+        "flag": "Vehicle moved before inspection",
+        "severity": "High",
+        "explanation": "The vehicle was towed directly to QuickFix Auto Body before an independent adjuster inspection could be scheduled."
+      }
+    ],
+    "summary": "This auto claim exhibits multiple high-risk fraud indicators, including a policy incepted only 9 days before the loss, a 5-day reporting delay, and the absence of a police report for a single-vehicle total loss. Furthermore, the vehicle was moved to a repair shop before an inspection could take place. Deferring to human judgment, an immediate SIU escalation is recommended to investigate the circumstances of the loss.",
+    "recommended_action": "Escalate to SIU",
+    "confidence": 0.9,
+    "claim_id": "CLM-1003",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:25:51.697641+00:00"
+  },
+  "CLM-1004": {
+    "risk_score": 75,
+    "risk_level": "High",
+    "red_flags": [
+      {
+        "flag": "Recurring Provider and Counsel Network",
+        "severity": "High",
+        "explanation": "The claimant has a history of two prior soft-tissue injury claims in the last 24 months involving the exact same medical provider and legal counsel."
+      },
+      {
+        "flag": "Soft-tissue Injury with No Independent Verification",
+        "severity": "Medium",
+        "explanation": "The claim involves soft-tissue injuries (whiplash and lower back pain) from a low-speed rear-end collision with no police report filed and zero independent witnesses."
+      },
+      {
+        "flag": "High Prior Claim Frequency",
+        "severity": "Medium",
+        "explanation": "The claimant has logged two prior claims within the last three years under the policy."
+      }
+    ],
+    "summary": "This auto injury claim involves a low-speed rear-end collision resulting in soft-tissue complaints treated at Riverside Wellness & Rehab and represented by Marcus Webb, Esq. Adjuster notes highlight a concerning pattern where the claimant's two prior claims in the last 24 months featured the exact same medical provider and attorney. Combined with the absence of a police report and independent witnesses, this indicates a high risk of a staged or inflated injury claim.",
+    "recommended_action": "Escalate to SIU",
+    "confidence": 0.85,
+    "claim_id": "CLM-1004",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:25:56.817565+00:00"
+  },
+  "CLM-1005": {
+    "risk_score": 75,
+    "risk_level": "High",
+    "red_flags": [
+      {
+        "flag": "Suspicious Soft-Tissue Injury Ring Pattern",
+        "severity": "High",
+        "explanation": "The claimant is a passenger tied to claim CLM-1004, sharing the exact same medical provider and attorney, which strongly indicates a coordinated soft-tissue injury ring."
+      },
+      {
+        "flag": "Missing Police Report",
+        "severity": "Medium",
+        "explanation": "No police report was filed for an incident involving multiple alleged injuries and claims."
+      },
+      {
+        "flag": "Absence of Independent Witnesses",
+        "severity": "Medium",
+        "explanation": "There are no independent witnesses to verify the claimant's presence or involvement as a passenger in the described vehicle collision."
+      }
+    ],
+    "summary": "Thomas Nguyen filed a passenger injury claim tied to a multi-claimant collision (CLM-1004) featuring soft-tissue injuries, representation by the same attorney, and treatment at the same medical clinic without a police report or independent witnesses. These overlapping indicators point strongly toward a staged or inflated accident ring. Deferring final judgment to the human adjuster, an immediate escalation to SIU is recommended.",
+    "recommended_action": "Escalate to SIU",
+    "confidence": 0.9,
+    "claim_id": "CLM-1005",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:01.728638+00:00"
+  },
+  "CLM-1006": {
+    "risk_score": 58,
+    "risk_level": "Medium",
+    "red_flags": [
+      {
+        "flag": "Inflated repair costs",
+        "severity": "High",
+        "explanation": "The repair estimate of $6,200 from QuickFix Auto Body is roughly 3x the typical market cost for a minor parking lot scrape based on comparable claims."
+      },
+      {
+        "flag": "Disproportionate scope of work",
+        "severity": "Medium",
+        "explanation": "The repair estimate includes a full panel replacement and repainting of adjacent panels for a minor parking lot scrape to the rear quarter panel."
+      }
+    ],
+    "summary": "This auto claim involves a minor parking lot scrape with no injuries, a clean long-term policy history, and prompt reporting. However, the repair estimate from QuickFix Auto Body is disproportionately high\u2014approximately triple the typical market cost\u2014raising concerns about inflated damages. Recommend requesting an independent adjuster inspection or secondary repair estimate before proceeding.",
+    "recommended_action": "Request More Information",
+    "confidence": 0.85,
+    "claim_id": "CLM-1006",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:06.346561+00:00"
+  },
+  "CLM-1007": {
+    "risk_score": 0,
+    "risk_level": "Low",
+    "red_flags": [],
+    "summary": "This claim involves a straightforward rear-end collision reported on the same day as the incident. The insured has a long, clean policy history of 12 years with zero prior claims, and the accident is fully supported by a police report and three independent witnesses.",
+    "recommended_action": "Approve",
+    "confidence": 0.95,
+    "claim_id": "CLM-1007",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:10.554661+00:00"
+  },
+  "CLM-1009": {
+    "risk_score": 58,
+    "risk_level": "Medium",
+    "red_flags": [
+      {
+        "flag": "Delayed reporting",
+        "severity": "Medium",
+        "explanation": "The claimant waited five days after the alleged vehicle theft before reporting the incident to the insurance carrier."
+      },
+      {
+        "flag": "Financial distress",
+        "severity": "High",
+        "explanation": "A recent credit report and underwriting review indicate the claimant is currently experiencing financial distress."
+      },
+      {
+        "flag": "Absence of objective tracking data",
+        "severity": "Low",
+        "explanation": "The vehicle lacked GPS or telematics data to independently verify the location history leading up to the reported theft."
+      }
+    ],
+    "summary": "Carlos Vega filed an auto theft claim for $22,000 after his vehicle was allegedly stolen from a public street and later recovered stripped of parts. While a police report was filed and the claimant has no prior claims in the last three years, the file exhibits moderate risk indicators including a five-day reporting delay, a lack of telematics verification, and noted financial distress. We recommend investigating further before making a final coverage determination.",
+    "recommended_action": "Investigate",
+    "confidence": 0.85,
+    "claim_id": "CLM-1009",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:20.178925+00:00"
+  },
+  "CLM-1010": {
+    "risk_score": 12,
+    "risk_level": "Low",
+    "red_flags": [],
+    "summary": "This property claim for roof and gutter damage is well-documented, timely reported, and directly corresponds to a confirmed regional hailstorm on the date of loss. The policy has a long and clean history dating back to 2017, with minimal prior claims and strong mitigating evidence including timestamped photos and a licensed contractor estimate.",
+    "recommended_action": "Approve",
+    "confidence": 0.95,
+    "claim_id": "CLM-1010",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:25.222414+00:00"
+  },
+  "CLM-1012": {
+    "risk_score": 5,
+    "risk_level": "Low",
+    "red_flags": [],
+    "summary": "This is a low-value, single-vehicle driveway collision reported on the same day as the incident. The policy has been active for over four years with no prior claims, and the repair estimate aligns with the described minor damage. The claim demonstrates strong mitigating factors with zero suspicious indicators.",
+    "recommended_action": "Approve",
+    "confidence": 0.95,
+    "claim_id": "CLM-1012",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:34.301383+00:00"
+  },
+  "CLM-1013": {
+    "risk_score": 35,
+    "risk_level": "Low",
+    "red_flags": [
+      {
+        "flag": "Household claimant frequency",
+        "severity": "Low",
+        "explanation": "The claimant shares an address with another recent claimant (CLM-1008), which warrants minor scrutiny given the close timing of the filings."
+      }
+    ],
+    "summary": "This is a modest auto glass claim for a cracked windshield caused by road debris, reported promptly the day after the incident. While there is a shared household address with another recent claimant, the claim amount is low, plausible, and consistent with everyday driving hazards. No major fraud indicators are present.",
+    "recommended_action": "Approve",
+    "confidence": 0.85,
+    "claim_id": "CLM-1013",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:38.822869+00:00"
+  },
+  "CLM-1014": {
+    "risk_score": 68,
+    "risk_level": "Medium",
+    "red_flags": [
+      {
+        "flag": "High visit frequency at a newly opened clinic",
+        "severity": "High",
+        "explanation": "The claimant attended fourteen physical therapy visits over three weeks at a clinic that only opened two months prior to the incident."
+      },
+      {
+        "flag": "Possible upcoding",
+        "severity": "Medium",
+        "explanation": "Billing codes reviewed by the adjuster demonstrate a pattern consistent with upcoding relative to the documented treatment notes."
+      },
+      {
+        "flag": "Delayed reporting",
+        "severity": "Medium",
+        "explanation": "The incident occurred on June 5, 2026, but was not reported until July 10, 2026, representing a delay of over a month."
+      }
+    ],
+    "summary": "This health insurance claim involves soft-tissue treatment at a newly opened clinic with an unusually high visit frequency and indicators of upcoding by the adjuster. While the policyholder has a clean prior claims history spanning several years, the combination of delayed reporting, billing irregularities, and provider characteristics warrants closer scrutiny. We recommend investigating the provider's billing practices before making a final payment determination.",
+    "recommended_action": "Investigate",
+    "confidence": 0.85,
+    "claim_id": "CLM-1014",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:43.668773+00:00"
+  },
+  "CLM-1015": {
+    "risk_score": 10,
+    "risk_level": "Low",
+    "red_flags": [],
+    "summary": "Michael Torres filed a property claim for $5,400 due to wind damage from a confirmed regional storm event. The policy has a long, clean history since 2018 with no prior claims in the last three years, and the adjuster noted the documentation is adequate.",
+    "recommended_action": "Approve",
+    "confidence": 0.95,
+    "claim_id": "CLM-1015",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:47.807570+00:00"
+  },
+  "CLM-1016": {
+    "risk_score": 85,
+    "risk_level": "High",
+    "red_flags": [
+      {
+        "flag": "High prior claim frequency",
+        "severity": "High",
+        "explanation": "The claimant has filed three soft-tissue injury claims within an 18-month period, each involving a different vehicle."
+      },
+      {
+        "flag": "Suspicious recurring professional network",
+        "severity": "High",
+        "explanation": "Every claim by this insured involves the exact same medical provider (Riverside Wellness & Rehab) and legal representation (Marcus Webb, Esq.)."
+      },
+      {
+        "flag": "Absence of police report",
+        "severity": "Medium",
+        "explanation": "No police report was filed for the incident, limiting independent verification of the accident."
+      },
+      {
+        "flag": "Absence of independent witnesses",
+        "severity": "Medium",
+        "explanation": "There are no independent witnesses to corroborate the collision details."
+      }
+    ],
+    "summary": "The claim exhibits strong indicators of an organized soft-tissue fraud ring, featuring a repeat claimant with three similar incidents in 18 months, zero witnesses, no police report, and a persistent network of the same medical clinic and attorney. Given the clear pattern of staged or inflated soft-tissue claims, this file warrants immediate escalation.",
+    "recommended_action": "Escalate to SIU",
+    "confidence": 0.95,
+    "claim_id": "CLM-1016",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:52.698127+00:00"
+  },
+  "CLM-1017": {
+    "risk_score": 5,
+    "risk_level": "Low",
+    "red_flags": [],
+    "summary": "This is a low-risk property vandalism claim filed promptly with an accompanying police report and clear photographic evidence. The policy has been active for several years with no prior claims, and the claimed amount is modest and consistent with the documented damage.",
+    "recommended_action": "Approve",
+    "confidence": 0.95,
+    "claim_id": "CLM-1017",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:26:57.034451+00:00"
+  },
+  "CLM-1018": {
+    "risk_score": 75,
+    "risk_level": "High",
+    "red_flags": [
+      {
+        "flag": "Damage Inconsistency",
+        "severity": "High",
+        "explanation": "Claimant reports major frame damage and seeks $19,500, but submitted photos and adjuster review confirm only minor cosmetic scuffing to the bumper cover."
+      },
+      {
+        "flag": "Suspicious Repair Estimate",
+        "severity": "High",
+        "explanation": "QuickFix Auto Body provided an estimate for frame straightening and structural parts replacement that does not align with the superficial damage visible in the photos."
+      },
+      {
+        "flag": "Absence of Police Report",
+        "severity": "Medium",
+        "explanation": "No police report was filed for a collision allegedly causing major structural damage in a public parking structure."
+      }
+    ],
+    "summary": "Sophia Delgado filed an auto claim for $19,500 alleging major frame damage from a parking structure incident, supported by QuickFix Auto Body. However, adjuster review and photos indicate only minor cosmetic bumper scuffing, revealing a significant discrepancy between the claimed damage and supporting evidence. Combined with the lack of an independent police report, this file exhibits strong indicators of inflated repair costs.",
+    "recommended_action": "Escalate to SIU",
+    "confidence": 0.9,
+    "claim_id": "CLM-1018",
+    "model": "gemini-flash-lite-latest",
+    "generated_at": "2026-08-17T13:27:01.940900+00:00"
+  }
+}

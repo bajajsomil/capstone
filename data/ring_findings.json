@@ -1,0 +1,38 @@
+{
+  "clusters": [
+    {
+      "cluster_name": "Riverside Wellness & Marcus Webb Injury Ring",
+      "claim_ids": [
+        "CLM-1004",
+        "CLM-1005",
+        "CLM-1011",
+        "CLM-1016"
+      ],
+      "shared_entities": [
+        "Riverside Wellness & Rehab",
+        "Marcus Webb, Esq."
+      ],
+      "risk_level": "High",
+      "explanation": "Multiple claims involving different individuals (Angela Ruiz, Thomas Nguyen, Jerome Watts, Natalie Reyes) are tied together by the exact same medical provider (Riverside Wellness & Rehab) and legal representation (Marcus Webb, Esq.). The cluster exhibits classic soft-tissue injury ring patterns, including repeat claimants, lack of independent witnesses, timeline inconsistencies, and refusal of independent medical examinations."
+    },
+    {
+      "cluster_name": "QuickFix Auto Body Inflation and Staged Loss Ring",
+      "claim_ids": [
+        "CLM-1003",
+        "CLM-1006",
+        "CLM-1018",
+        "CLM-1019",
+        "CLM-1020",
+        "CLM-1021"
+      ],
+      "shared_entities": [
+        "QuickFix Auto Body"
+      ],
+      "risk_level": "High",
+      "explanation": "A network of claims routed through QuickFix Auto Body displaying severe fraud indicators: highly inflated estimates for minor cosmetic damage (CLM-1006, CLM-1018), suspicious single-vehicle total loss claims with no police reports and immediate towing to the same shop (CLM-1003), and duplicate fraudulent filings requesting fast cash settlements (CLM-1019, CLM-1020, CLM-1021)."
+    }
+  ],
+  "overall_summary": "Analysis of the claim batch reveals two highly organized fraud rings operating in Springfield. The first is a medical-legal collusion ring centered around Riverside Wellness & Rehab and attorney Marcus Webb, specializing in inflated soft-tissue injury claims. The second is an auto repair fraud ring centered around QuickFix Auto Body, characterized by inflated estimates, staged or poorly documented single-vehicle total losses, and duplicate filings.",
+  "model": "gemini-flash-lite-latest",
+  "generated_at": "2026-08-17T13:30:55.017593+00:00"
+}
