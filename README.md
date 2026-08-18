@@ -2,7 +2,7 @@
 
 **Capstone Project — AI Practitioner+ Program**
 
-**🔗 Live demo: [capstone-fq7ru8h8e5u9cfnkjmfhvu.streamlit.app](https://capstone-fq7ru8h8e5u9cfnkjmfhvu.streamlit.app/)**
+**🔗 Live demo: [capstone-fraudshield.streamlit.app](https://capstone-fraudshield.streamlit.app/)**
 
 FraudShield takes a real, well-scoped business problem — first-pass triage of insurance claims for
 fraud — and works it end to end: a scoped AI workflow with grounding rules and structured output, a
