@@ -104,7 +104,7 @@ def render_assessment(assessment: dict):
         "**Recommended action:** " + action_badge_html(assessment["recommended_action"]),
         unsafe_allow_html=True,
     )
-    st.caption(f"Model confidence: {assessment.get('confidence', 0):.0%}")
+    st.caption(f"Model-reported confidence: {assessment.get('confidence', 0):.0%}")
     if assessment.get("red_flags"):
         st.markdown("**Red flags**")
         for flag in assessment["red_flags"]:

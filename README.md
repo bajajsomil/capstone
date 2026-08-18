@@ -10,14 +10,14 @@ cross-claim network-analysis feature no single-claim review would catch, retry/f
 flaky external dependency, an automated test suite, an evaluation harness against known outcomes, and an
 explicit accounting of what it would take to move this from MVP to production.
 
-> **Model provider.** This program's brief specifies building with Claude. The AI integration was
-> designed provider-agnostically from day one — every prompt, schema, and business rule is independent of
-> any one vendor's SDK, with all provider-specific code isolated in a single module
-> ([`fraudshield/ai_client.py`](fraudshield/ai_client.py)). That abstraction was tested for real
-> partway through the build: the backend was swapped from an Anthropic Claude implementation to the
-> current Google Gemini implementation without touching anything else in the app. The current deployment
-> runs on **Gemini** via the `google-genai` SDK — swapping back, or supporting both, only touches that
-> one file.
+> **Model provider.** This program's brief specifies Claude. The application was deliberately designed
+> with provider isolation — every prompt, schema, and business rule lives independently of any one
+> vendor's SDK, with all provider-specific code confined to a single module
+> ([`fraudshield/ai_client.py`](fraudshield/ai_client.py)) behind an
+> [LLM provider boundary](#architecture). That architecture was validated for real, not just claimed: the
+> implementation was migrated from Anthropic Claude to Google Gemini without changing the application,
+> schemas, or business logic anywhere else. **The live demo currently runs on Gemini** via the
+> `google-genai` SDK.
 
 ## Contents
 
@@ -86,6 +86,17 @@ rest of the app — data model, UI, validation, tests — has no knowledge of wh
 `analyze_claim()` and `detect_fraud_rings()`. This was validated in practice, not just claimed: see the
 model-provider note above.
 
+**6. Why AI reasoning instead of a rules engine.** A rule like `policy_age < 30 days AND no_police_report
+→ HIGH RISK` is deterministic but brittle — it only catches fraud patterns someone already thought to
+encode, and can't weigh context (a severe accident isn't suspicious; a minor one with five red flags is).
+FraudShield instead gives the model the full claim narrative — policy age, police report, witnesses,
+prior claims, the incident description, repair provider, mitigating evidence — and asks it to reason
+about the combination the way an investigator would, then return that reasoning as structured, auditable
+output rather than an opaque score. Rules aren't abandoned, though: [the production
+path](#from-mvp-to-production) pairs a deterministic rules engine alongside the AI orchestrator — rules
+for the checks that should always fire the same way, AI for reasoning over the narrative that rules can't
+capture.
+
 ## Architecture
 
 ```mermaid
@@ -106,6 +117,19 @@ flowchart TD
     J --> L
     K --> L
 ```
+
+**LLM provider boundary.** Everything above `fraudshield/ai_client.py` — the Streamlit pages, the data
+model, validation, tests — has no knowledge of which model provider sits behind it:
+
+```mermaid
+flowchart TD
+    APP[Application: pages, data model, tests] --> BOUNDARY["AI Client Boundary<br/>(fraudshield/ai_client.py)"]
+    BOUNDARY -.tested.-> CLAUDE[Anthropic Claude]
+    BOUNDARY --> GEMINI[Google Gemini]
+```
+
+Provider migration was validated by actually doing it, not just designing for it: the implementation
+moved from Claude to Gemini without touching the application, schemas, or business logic.
 
 ```
 capstone/
@@ -141,8 +165,13 @@ capstone/
 **Stack:** Python + [Streamlit](https://streamlit.io) (no separate frontend build step — this machine
 didn't have Node.js available, and Streamlit gets a working, presentable UI shipped in a single day) +
 the official `google-genai` SDK, using Gemini's controlled generation (`response_schema`) for structured
-output. Claim and assessment data are plain JSON files — no database needed for a proof of concept at
-this scale (see [From MVP to production](#from-mvp-to-production) for what changes at real scale).
+output.
+
+**MVP trade-off, stated explicitly:** claim and assessment data are plain JSON files
+(`fraudshield/data.py`) rather than a database. This was a deliberate choice to minimize infrastructure
+and keep a one-day prototype deployable — not an oversight. It doesn't hold up under concurrent writers or
+durable multi-user production use; see [From MVP to production](#from-mvp-to-production) for the
+transactional persistent storage that would replace it.
 
 ## AI Guardrails
 
@@ -251,16 +280,33 @@ Latest run ([full output](evaluation/RESULTS.md)):
 |---|---|
 | Structured output validity | **18/18 (100%)** |
 | Risk-tier exact agreement | **16/18 (88.9%)** |
-| Fraud-ring true positives | **6/6** |
-| Fraud-ring false positives | **0** |
-| Fraud-ring false negatives | **0** |
+| Fraud-ring precision | **100%** |
+| Fraud-ring recall | **100%** |
+| Fraud-ring F1 | **100%** |
 
-The two tier disagreements (`CLM-1009`, `CLM-1014`) were both the model rating a claim **Medium** where the
-claim was designed to be **High** — an under-call, not a dangerous over- or under-classification in the
-opposite direction (nothing designed as High dropped to Low, and nothing designed as Low was bumped up).
-Both are reported in [`evaluation/RESULTS.md`](evaluation/RESULTS.md) rather than hidden. The ring
-detection correctly identified all six real ring members and, notably, did **not** flag the `CLM-1008`
-/ `CLM-1013` shared-address trap case as a ring — the disagreements a reviewer should be checking for.
+The ring-detection precision/recall is on **6 expected members in an 18-claim synthetic set** — a sanity
+check, not a statistically meaningful sample, and it's reported as a ratio for exactly that reason rather
+than rounded up to a headline "100% fraud detection" claim.
+
+### Evaluation findings (reported, not tuned away)
+
+Two claims disagreed with the design intent — both are the model rating a claim **Medium** where it was
+designed to be **High**: an under-call, not the more dangerous failure mode of a High-designed claim
+dropping to Low or a Low-designed claim getting bumped up.
+
+| Claim | Expected | AI | Score | Finding |
+|---|---|---|---|---|
+| `CLM-1009` | High | Medium | 58 | Under-call — delayed theft report, no telematics, noted financial distress |
+| `CLM-1014` | High | Medium | 68 | Under-call — high visit frequency at a new clinic, adjuster-flagged upcoding |
+
+**Next engineering step** these two point to: check whether these cases need stronger prompt guidance
+around financial-distress and billing-pattern indicators specifically, or whether they're better handled
+by a deterministic rule feeding into the AI orchestrator (see [decision
+6](#key-engineering-decisions)) rather than relying on narrative reasoning alone.
+
+The ring detection correctly identified all six real ring members with zero false positives and zero
+false negatives, and — the more interesting result — correctly did **not** flag the `CLM-1008` /
+`CLM-1013` shared-address trap case as a ring. Full run output: [`evaluation/RESULTS.md`](evaluation/RESULTS.md).
 
 ## Setup
 
@@ -294,7 +340,8 @@ friendly error instead of crashing.
 
 ## Suggested demo flow
 
-1. **Home** — business framing: the problem, how the pipeline works, illustrative impact.
+1. **Home** — business framing: the problem, how the pipeline works, and the real evaluation results
+   (schema validity, risk-tier agreement, ring detection) rather than illustrative projections.
 2. **Claims Dashboard** — show the KPI row and charts, then open a clean low-risk claim (e.g. `CLM-1007`)
    and a high-risk one (e.g. `CLM-1003` or `CLM-1018`) to contrast the reasoning and red flags.
 3. **Submit a New Claim** — click "Load a suspicious claim example" (or type your own) and submit live,
@@ -309,8 +356,9 @@ This is an MVP built for a one-day capstone, not a production underwriting syste
 
 - All claim and claimant data in `data/claims_seed.json` is **synthetic**, invented for this demo.
 - Risk scores are decision-support signals for a human adjuster, not automated denials or approvals.
-- The business-impact figures on the Home page are **illustrative** industry-benchmark estimates, not
-  measured results from a production deployment.
+- The Home page shows real evaluation metrics (schema validity, risk-tier agreement, ring detection) from
+  this project's own 18-claim synthetic set, not measured results from a production deployment or an
+  independent benchmark.
 - The [evaluation](#engineering-quality-testing--evaluation) ground truth is self-authored against a
   synthetic dataset, not an independently labeled benchmark — treat it as a sanity check, not proof of
   production-grade accuracy.

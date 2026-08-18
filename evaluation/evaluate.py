@@ -71,6 +71,11 @@ def main():
     false_positives = actual_ring_members - ring_expected
     false_negatives = ring_expected - actual_ring_members
 
+    tp, fp, fn = len(true_positives), len(false_positives), len(false_negatives)
+    precision = tp / (tp + fp) if (tp + fp) else 0.0
+    recall = tp / (tp + fn) if (tp + fn) else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
+
     total = len(cases)
     tier_accuracy = len(tier_matches) / total
 
@@ -94,11 +99,13 @@ def main():
     lines.append("## Risk-tier agreement\n")
     lines.append(f"- Exact tier match: {len(tier_matches)}/{total} ({tier_accuracy:.1%})")
     if tier_mismatches:
-        lines.append(f"- Mismatches ({len(tier_mismatches)}):")
+        lines.append(f"- Mismatches, reported rather than tuned away ({len(tier_mismatches)}):\n")
+        lines.append("| Claim | Expected | Actual | Score | Note |")
+        lines.append("|---|---|---|---|---|")
         for m in tier_mismatches:
             lines.append(
-                f"  - **{m['claim_id']}**: expected {m['expected']}, got {m['actual']} "
-                f"(score {m['score']}) - {m['rationale']}"
+                f"| {m['claim_id']} | {m['expected']} | {m['actual']} | {m['score']} | "
+                f"{m['rationale']} |"
             )
     else:
         lines.append("- No mismatches.")
@@ -107,9 +114,14 @@ def main():
     lines.append("## Fraud ring detection\n")
     lines.append(f"- Expected ring members: {sorted(ring_expected)}")
     lines.append(f"- Flagged by the model: {sorted(actual_ring_members)}")
-    lines.append(f"- True positives: {len(true_positives)}/{len(ring_expected)}")
+    lines.append(f"- True positives: {tp}/{len(ring_expected)}")
     lines.append(f"- False positives (flagged but shouldn't be): {sorted(false_positives) or 'none'}")
     lines.append(f"- False negatives (missed): {sorted(false_negatives) or 'none'}")
+    lines.append(f"- Precision: {precision:.0%} · Recall: {recall:.0%} · F1: {f1:.0%}")
+    lines.append(
+        "  (on 6 expected ring members in an 18-claim synthetic set - a sanity check, not a "
+        "statistically meaningful sample)"
+    )
     lines.append(
         "- Notably, CLM-1008 and CLM-1013 share an address but were correctly **not** flagged as "
         "a ring - a deliberate trap case for over-flagging on coincidental overlap."

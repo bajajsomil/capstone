@@ -11,9 +11,12 @@ Evaluation set: 18 synthetic claims
 ## Risk-tier agreement
 
 - Exact tier match: 16/18 (88.9%)
-- Mismatches (2):
-  - **CLM-1009**: expected High, got Medium (score 58) - Delayed theft report, no telematics data, noted financial distress.
-  - **CLM-1014**: expected High, got Medium (score 68) - Unusually high visit frequency at a newly opened clinic, adjuster-flagged upcoding pattern.
+- Mismatches, reported rather than tuned away (2):
+
+| Claim | Expected | Actual | Score | Note |
+|---|---|---|---|---|
+| CLM-1009 | High | Medium | 58 | Delayed theft report, no telematics data, noted financial distress. |
+| CLM-1014 | High | Medium | 68 | Unusually high visit frequency at a newly opened clinic, adjuster-flagged upcoding pattern. |
 
 ## Fraud ring detection
 
@@ -22,4 +25,6 @@ Evaluation set: 18 synthetic claims
 - True positives: 6/6
 - False positives (flagged but shouldn't be): none
 - False negatives (missed): none
+- Precision: 100% · Recall: 100% · F1: 100%
+  (on 6 expected ring members in an 18-claim synthetic set - a sanity check, not a statistically meaningful sample)
 - Notably, CLM-1008 and CLM-1013 share an address but were correctly **not** flagged as a ring - a deliberate trap case for over-flagging on coincidental overlap.

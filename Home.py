@@ -39,7 +39,7 @@ with left:
     steps = [
         ("1. Ingest", "A new or existing claim's facts, history, and documentation notes are structured for review."),
         ("2. Reason", "Gemini weighs fraud indicators against mitigating evidence — police reports, witnesses, tenure — the way a senior investigator would."),
-        ("3. Score & explain", "A calibrated 0–100 risk score, a risk tier, and specific red flags are returned as structured data, not a black box."),
+        ("3. Score & explain", "A 0–100 risk score, a risk tier, and specific red flags are returned as structured data, not a black box."),
         ("4. Decide", "A human adjuster reviews the recommendation — Approve, Request Info, Investigate, or Escalate to SIU — and makes the final call."),
     ]
     cols = st.columns(4)
@@ -49,11 +49,27 @@ with left:
             st.caption(desc)
 
 with right:
-    st.subheader("Why it matters")
-    st.metric("Illustrative loss ratio impact", "−15 to −25%", help="Directional estimate based on industry SIU benchmarks for AI-assisted triage; not a guarantee.")
-    st.metric("Faster processing for genuine claims", "Minutes, not days", help="Low-risk claims can be fast-tracked instead of sitting in a generic review queue.")
-    st.metric("Also catches", "Organized fraud rings", help="Cross-claim network analysis links claims sharing repair shops, clinics, attorneys, or addresses.")
-    st.info("This is a proof-of-concept: illustrative figures above are directional, not measured production results.", icon="ℹ️")
+    st.subheader("Evidence-backed prototype results")
+    m1, m2 = st.columns(2)
+    m1.metric("Schema validity", "18/18", help="Every cached assessment validates against the FraudAssessment Pydantic schema.")
+    m2.metric("Risk-tier agreement", "16/18", help="88.9% exact agreement against a self-authored ground truth over 18 synthetic claims.")
+    m3, m4 = st.columns(2)
+    m3.metric("Ring members found", "6/6", help="Zero false positives, zero false negatives — including a deliberate shared-address trap case.")
+    m4.metric("Tests passing", "27/27", help="Unit tests against a mocked Gemini client: persistence, formatting, retry/backoff, response validation.")
+    st.caption(
+        "From 18 synthetic claims and a self-authored ground truth — a sanity check, not a "
+        "production benchmark. Full methodology and the two disclosed disagreements in "
+        "[evaluation/RESULTS.md](https://github.com/bajajsomil/capstone/blob/main/evaluation/RESULTS.md)."
+    )
+
+    st.markdown("##### Responsible AI by design")
+    st.markdown(
+        "🛡️ **Human decision required** — the model recommends an action, a person decides.\n\n"
+        "📋 **Evidence-grounded red flags** — grounded only in facts present in the claim file.\n\n"
+        "🧩 **Structured schema validation** — every response is Pydantic-validated, never parsed free text.\n\n"
+        "🔄 **Explicit failure handling** — API errors retry with backoff, then fail loudly, never silently.\n\n"
+        "🧪 **Evaluated against known cases** — including a deliberate over-flagging trap case."
+    )
 
 st.divider()
 st.subheader("Explore the prototype")
