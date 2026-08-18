@@ -1,0 +1,20 @@
+[
+  {"claim_id": "CLM-1001", "expected_risk_tier": "Low",    "expected_in_ring": false, "rationale": "Clean rear-end collision, police report, witnesses, long clean policy."},
+  {"claim_id": "CLM-1002", "expected_risk_tier": "Low",    "expected_in_ring": false, "rationale": "Fire department report on file, itemized contractor estimate consistent with photos."},
+  {"claim_id": "CLM-1003", "expected_risk_tier": "High",   "expected_in_ring": true,  "rationale": "Policy incepted 9 days before loss, no police report, towed straight to QuickFix Auto Body."},
+  {"claim_id": "CLM-1004", "expected_risk_tier": "High",   "expected_in_ring": true,  "rationale": "Soft-tissue injury ring: same clinic/attorney/repair shop as CLM-1005 and CLM-1016."},
+  {"claim_id": "CLM-1005", "expected_risk_tier": "High",   "expected_in_ring": true,  "rationale": "Passenger claim tied to CLM-1004, same clinic and attorney, no independent witnesses."},
+  {"claim_id": "CLM-1006", "expected_risk_tier": "Medium", "expected_in_ring": true,  "rationale": "Repair estimate ~3x market rate for the damage, same repair shop as the ring."},
+  {"claim_id": "CLM-1007", "expected_risk_tier": "Low",    "expected_in_ring": false, "rationale": "12-year clean policyholder, police report, 3 corroborating witnesses."},
+  {"claim_id": "CLM-1008", "expected_risk_tier": "Medium", "expected_in_ring": false, "rationale": "Coverage increase shortly before loss, unverified contractor - ambiguous, not a ring."},
+  {"claim_id": "CLM-1009", "expected_risk_tier": "High",   "expected_in_ring": false, "rationale": "Delayed theft report, no telematics data, noted financial distress."},
+  {"claim_id": "CLM-1010", "expected_risk_tier": "Low",    "expected_in_ring": false, "rationale": "Loss date matches a confirmed regional storm event, thorough documentation."},
+  {"claim_id": "CLM-1011", "expected_risk_tier": "High",   "expected_in_ring": false, "rationale": "Inconsistent statements across time, twice declined an independent medical exam."},
+  {"claim_id": "CLM-1012", "expected_risk_tier": "Low",    "expected_in_ring": false, "rationale": "Small, plausible, self-reported single-vehicle incident."},
+  {"claim_id": "CLM-1013", "expected_risk_tier": "Low",    "expected_in_ring": false, "rationale": "Deliberate trap case: shares an address with CLM-1008 but is otherwise a modest, plausible claim - should NOT be flagged as a ring on address alone."},
+  {"claim_id": "CLM-1014", "expected_risk_tier": "High",   "expected_in_ring": false, "rationale": "Unusually high visit frequency at a newly opened clinic, adjuster-flagged upcoding pattern."},
+  {"claim_id": "CLM-1015", "expected_risk_tier": "Low",    "expected_in_ring": false, "rationale": "Consistent with the same confirmed storm event as CLM-1010, adequate documentation."},
+  {"claim_id": "CLM-1016", "expected_risk_tier": "High",   "expected_in_ring": true,  "rationale": "Third soft-tissue claim in 18 months, same clinic/attorney/repair shop pattern."},
+  {"claim_id": "CLM-1017", "expected_risk_tier": "Low",    "expected_in_ring": false, "rationale": "Police report on file, damage consistent with photos, modest amount."},
+  {"claim_id": "CLM-1018", "expected_risk_tier": "High",   "expected_in_ring": true,  "rationale": "Claimed structural damage inconsistent with photos showing only cosmetic scuffing."}
+]

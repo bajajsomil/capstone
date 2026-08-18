@@ -4,24 +4,47 @@
 
 **🔗 Live demo: [capstone-fq7ru8h8e5u9cfnkjmfhvu.streamlit.app](https://capstone-fq7ru8h8e5u9cfnkjmfhvu.streamlit.app/)**
 
-FraudShield is a proof-of-concept fraud detection and prevention tool for insurance claims. It uses an
-LLM as an always-on Special Investigations Unit (SIU) analyst that reviews every claim the moment it's
-filed, scores its fraud risk with specific, evidence-grounded reasoning, and recommends a next action —
-so genuine claims move fast and suspicious ones get routed to investigation immediately.
+FraudShield takes a real, well-scoped business problem — first-pass triage of insurance claims for
+fraud — and works it end to end: a scoped AI workflow with grounding rules and structured output, a
+cross-claim network-analysis feature no single-claim review would catch, retry/failure handling for a
+flaky external dependency, an automated test suite, an evaluation harness against known outcomes, and an
+explicit accounting of what it would take to move this from MVP to production.
 
-> **Note on model choice:** this program is built around Claude, and the integration layer
-> (`fraudshield/ai_client.py`) was originally implemented against the Claude API. It runs on the
-> **Gemini API** in this build. The prompts, JSON-schema-based structured output design, and the rest of
-> the app are provider-agnostic — swapping back to Claude only requires rewriting that one file.
+> **Model provider.** This program's brief specifies building with Claude. The AI integration was
+> designed provider-agnostically from day one — every prompt, schema, and business rule is independent of
+> any one vendor's SDK, with all provider-specific code isolated in a single module
+> ([`fraudshield/ai_client.py`](fraudshield/ai_client.py)). That abstraction was tested for real
+> partway through the build: the backend was swapped from an Anthropic Claude implementation to the
+> current Google Gemini implementation without touching anything else in the app. The current deployment
+> runs on **Gemini** via the `google-genai` SDK — swapping back, or supporting both, only touches that
+> one file.
+
+## Contents
+
+[Business problem](#the-business-problem) · [What it does](#what-it-does) ·
+[Engineering decisions](#key-engineering-decisions) · [Architecture](#architecture) ·
+[AI guardrails](#ai-guardrails) · [Failure handling](#failure-handling) ·
+[Fraud ring detection](#fraud-ring-detection) ·
+[Testing & evaluation](#engineering-quality-testing--evaluation) · [Setup](#setup) ·
+[Demo flow](#suggested-demo-flow) · [Limitations](#responsible-use--limitations) ·
+[Production path](#from-mvp-to-production)
 
 ## The business problem
 
 Fraud is one of the fastest-growing loss drivers in insurance, amplified by digital channels, staged
 accidents, inflated repair bills, identity abuse, and organized fraud rings. Traditional rule-based
 checks alone are insufficient and reactive: they catch yesterday's fraud patterns while adding friction
-for the vast majority of genuine policyholders. FraudShield aims to provide proactive fraud prevention,
-lower loss ratios, reduced investigation cost, and improved claims integrity — while keeping processing
-fast and frictionless for legitimate claims.
+for the vast majority of genuine policyholders.
+
+**What this MVP actually delivers today:** it reduces the manual effort of first-pass claim triage by
+generating a structured risk assessment, evidence-backed red flags, and a recommended next action
+immediately after a claim is submitted — work that would otherwise sit in a generic review queue.
+
+**What a production deployment would be measured on** (not claimed here, since there's no production
+traffic to measure against): average claim triage time, investigator cases reviewed per day, high-risk
+precision, false-positive rate, SIU referral rate, and average investigation cost. The
+[evaluation](#engineering-quality-testing--evaluation) section below reports the closest proxy available
+at this stage — agreement against a known synthetic ground truth — rather than inventing ROI figures.
 
 ## What it does
 
@@ -36,45 +59,208 @@ fast and frictionless for legitimate claims.
 Every recommendation is explicitly framed as **decision support**, not a final determination — a human
 adjuster or investigator always makes the call. This is stated directly to the model in the system prompt.
 
-## How the AI is used
+## Key Engineering Decisions
 
-Rule engines can only catch fraud patterns someone already thought to encode. FraudShield instead gives
-the model the full claim narrative and asks it to reason the way a senior investigator would — weighing
-red flags *against* mitigating evidence (police reports, witnesses, policy tenure) rather than just
-pattern-matching keywords. Two design choices make this reliable enough to build a product on:
+**1. Structured AI output instead of free-form responses.** Every assessment is constrained by a Pydantic
+schema (`FraudAssessment` / `RingFindings`) passed to Gemini's controlled generation. The app never parses
+free text or hopes for well-formatted JSON — it gets a validated object back every time, so risk score,
+tier, red flags, recommended action, and confidence are always safe to consume programmatically.
 
-- **Schema-forced structured output.** Every analysis call defines a Pydantic schema (`FraudAssessment`
-  / `RingFindings`) and forces the model to respond only with a validated object matching it — the app
-  never parses free text. See [`fraudshield/ai_client.py`](fraudshield/ai_client.py).
-- **Grounding rules in the system prompt.** The model is explicitly told to base every red flag only on
-  facts present in the claim, to weigh mitigating evidence as heavily as suspicious signals, and to avoid
-  penalizing legitimate claimants for circumstances outside their control (e.g., a severe accident is not
-  itself suspicious).
+**2. Decision support, never automated decisions.** The model recommends an action; it does not approve,
+deny, or reject a claim. That boundary is enforced in the system prompt itself (see
+[AI Guardrails](#ai-guardrails)), not just in surrounding application code.
+
+**3. Single-claim analysis + cross-claim analysis, as two distinct passes.** Reasoning about one claim in
+isolation and reasoning about relationships across a claims book are different problems with different
+prompts and different schemas ([`analyze_claim`](fraudshield/ai_client.py) vs.
+[`detect_fraud_rings`](fraudshield/ai_client.py)) — collapsing them into one call would make the ring
+signal noisy and the single-claim reasoning slower.
+
+**4. Cached baseline analysis.** Seed claims use pre-computed assessments (`data/analysis_cache.json`)
+generated once via [`scripts/precompute_analysis.py`](scripts/precompute_analysis.py), so the dashboard
+stays responsive and deterministic during a demo instead of depending on live API latency for every page
+view. Live re-analysis and new-claim submission still hit the API in real time.
+
+**5. Provider abstraction.** All Gemini-specific code is isolated inside `fraudshield/ai_client.py`. The
+rest of the app — data model, UI, validation, tests — has no knowledge of which model provider is behind
+`analyze_claim()` and `detect_fraud_rings()`. This was validated in practice, not just claimed: see the
+model-provider note above.
 
 ## Architecture
 
+```mermaid
+flowchart TD
+    A[Claims Adjuster] --> B[Streamlit Frontend]
+    B --> C[Single-Claim Analysis]
+    B --> D[Fraud Ring Detection]
+    B --> E[Claim-Scoped Chat]
+    C --> F["AI Client<br/>(fraudshield/ai_client.py)"]
+    D --> F
+    E --> F
+    F --> G[Gemini API]
+    G --> H["Structured JSON<br/>(Pydantic-validated)"]
+    H --> I[Risk Score + Tier]
+    H --> J[Evidence-Grounded Red Flags]
+    H --> K[Recommended Action]
+    I --> L[Human Adjuster / SIU]
+    J --> L
+    K --> L
 ```
-Home.py                        Landing page / business case
-pages/1_Claims_Dashboard.py    KPIs, charts, filterable table, claim drill-down + chat
-pages/2_Submit_New_Claim.py    Live claim intake -> instant AI analysis
-pages/3_Fraud_Ring_Detection.py Cross-claim network analysis
-fraudshield/
-  ai_client.py                 All LLM API calls, structured-output schemas, system prompts
-  data.py                      Loading/caching of claims and assessments (JSON files)
-  ui.py                        Shared styling, badges, colors, chart-safe palette
-data/
-  claims_seed.json             18 synthetic claims (mix of clean, ambiguous, and fraud-ring cases)
-  analysis_cache.json          Pre-computed assessments for the seed claims (generated once, so the
-                                dashboard loads instantly without live API calls on every view)
-  ring_findings.json           Pre-computed fraud-ring analysis for the seed claims
-scripts/precompute_analysis.py One-time script that (re)generates the two cache files above
+
+```
+capstone/
+├── Home.py                          # Landing page / business case (Streamlit entrypoint)
+├── pages/
+│   ├── 1_Claims_Dashboard.py        # KPIs, charts, filterable table, claim drill-down + chat
+│   ├── 2_Submit_New_Claim.py        # Live claim intake -> instant AI analysis
+│   └── 3_Fraud_Ring_Detection.py    # Cross-claim network analysis
+├── fraudshield/                     # Core backend package
+│   ├── __init__.py                  # Loads .env / Streamlit secrets into os.environ
+│   ├── ai_client.py                 # All LLM calls, schemas, prompts, retry/backoff
+│   ├── data.py                      # Claim + cache persistence (JSON-backed)
+│   └── ui.py                        # Shared styling, badges, color tokens
+├── data/
+│   ├── claims_seed.json             # 18 synthetic claims (clean, ambiguous, fraud-ring cases)
+│   ├── analysis_cache.json          # Pre-computed Gemini assessments for the seed claims
+│   └── ring_findings.json           # Pre-computed fraud-ring analysis
+├── evaluation/                      # Ground-truth evaluation harness (see below)
+│   ├── evaluation_cases.json
+│   ├── evaluate.py
+│   └── RESULTS.md                   # Output of the last evaluation run
+├── scripts/
+│   └── precompute_analysis.py       # One-time script that (re)generates the cache files
+├── tests/                           # Pytest suite, mocked Gemini client, no network calls
+│   ├── test_ai_client.py
+│   ├── test_data.py
+│   └── test_ui.py
+├── requirements.txt
+├── requirements-dev.txt             # + pytest
+└── README.md
 ```
 
 **Stack:** Python + [Streamlit](https://streamlit.io) (no separate frontend build step — this machine
 didn't have Node.js available, and Streamlit gets a working, presentable UI shipped in a single day) +
 the official `google-genai` SDK, using Gemini's controlled generation (`response_schema`) for structured
 output. Claim and assessment data are plain JSON files — no database needed for a proof of concept at
-this scale.
+this scale (see [From MVP to production](#from-mvp-to-production) for what changes at real scale).
+
+## AI Guardrails
+
+FraudShield is intentionally designed as decision support, not an autonomous decision-maker. These rules
+are enforced directly in the system prompts in `fraudshield/ai_client.py`, not just described here:
+
+1. **The model cannot make the final claim decision.** It recommends Approve / Request More Info /
+   Investigate / Escalate to SIU; a human always makes the actual call.
+2. **Red flags must be grounded in supplied claim facts.** The prompt explicitly forbids inventing
+   details not present in the claim file.
+3. **Mitigating evidence must be weighed, not just suspicious signals.** Police reports, independent
+   witnesses, consistent documentation, and long clean policy history are meant to lower risk — even for
+   large claims.
+4. **Severe circumstances aren't automatically suspicious.** A serious accident or a large claim is not
+   itself a red flag without an actual fraud indicator behind it.
+5. **Structured output is schema-validated**, not trusted free text (see
+   [Key Engineering Decisions](#key-engineering-decisions)).
+6. **Provider/API failures are handled explicitly**, never silently — see [Failure Handling](#failure-handling).
+7. **All data is synthetic**, built for this capstone. Production deployment would require fairness/bias
+   evaluation, an audit trail, and a human-review workflow — see
+   [Responsible use & limitations](#responsible-use--limitations).
+
+## Failure Handling
+
+The Gemini free tier is bursty in practice: rate limits (429) and transient server overload (503) showed
+up regularly during development, so the client can't assume happy-path responses.
+
+```mermaid
+flowchart TD
+    A[Gemini API call] -->|429 rate limit or 503 overload| B[Retry with backoff]
+    B -->|Succeeds| C{Response matches schema?}
+    B -->|Retries exhausted| D[RuntimeError, no claim decision made]
+    C -->|Yes| E[Risk assessment shown to adjuster]
+    C -->|No| D
+    D --> F[Friendly error surfaced in the UI]
+```
+
+`_generate_with_retry` in `fraudshield/ai_client.py` retries 429s with linear backoff and 503s with
+exponential backoff up to a max attempt count, then raises a clean `RuntimeError` rather than crashing the
+page. A response that doesn't parse against the Pydantic schema is treated the same way as an API failure
+— **external failures never fall through to an automated claim outcome; they surface as an explicit error
+and no assessment is produced.** This behavior is unit tested (see
+[Engineering Quality](#engineering-quality-testing--evaluation)) with a mocked client, not just asserted
+here.
+
+## Fraud Ring Detection
+
+This is the standout feature relative to a typical AI-claims demo, which usually stops at *claim → LLM →
+risk score*. FraudShield adds a second pass: *claims book → relationship analysis → fraud-ring detection*,
+which is where individually-mild-looking claims turn out to be part of an organized pattern:
+
+```mermaid
+flowchart LR
+    C1["CLM-1004<br/>Angela Ruiz"] --- SHOP["QuickFix<br/>Auto Body"]
+    C2["CLM-1006<br/>Patricia Lowe"] --- SHOP
+    C3["CLM-1003<br/>Derek Simmons"] --- SHOP
+    C4["CLM-1018<br/>Sophia Delgado"] --- SHOP
+    C1 --- CLINIC["Riverside<br/>Wellness & Rehab"]
+    C5["CLM-1005<br/>Thomas Nguyen"] --- CLINIC
+    C6["CLM-1016<br/>Natalie Reyes"] --- CLINIC
+    C1 --- ATTY["Marcus Webb,<br/>Esq."]
+    C5 --- ATTY
+    C6 --- ATTY
+    SHOP --> CLUSTER[Suspicious Cluster]
+    CLINIC --> CLUSTER
+    ATTY --> CLUSTER
+    CLUSTER --> SIU[SIU Review]
+```
+
+The seed dataset deliberately includes both a real ring (six claims sharing a repair shop, a clinic, and
+an attorney across multiple claimants) and a **trap case** — two claims (`CLM-1008`, `CLM-1013`) that
+share only an address, with no other suspicious link, to test whether the model over-flags coincidence as
+collusion. The [evaluation results](#engineering-quality-testing--evaluation) below report exactly how
+that trap resolved — not just that a ring-detection feature exists.
+
+## Engineering Quality: Testing & Evaluation
+
+**Automated tests** (`pytest`, 27 tests, all against a mocked Gemini client — no network access or real
+API calls needed to run the suite):
+
+- Claim, cache, and assessment persistence round-trips (`fraudshield/data.py`)
+- UI formatting and status-badge mapping (`fraudshield/ui.py`)
+- API retry/backoff on 429 rate limits and 503 server overload, giving up cleanly after max attempts,
+  *not* retrying genuine 4xx errors like 404 (`fraudshield/ai_client.py`)
+- Structured-response validation, including the failure path when a response doesn't match the schema
+
+```
+pip install -r requirements-dev.txt
+python -m pytest tests/
+```
+
+**AI evaluation** (`evaluation/evaluate.py`) is a separate concern from unit tests: it checks whether the
+AI's actual judgments agree with a known ground truth, run against the real cached outputs in
+`data/analysis_cache.json` and `data/ring_findings.json`. The ground truth
+(`evaluation/evaluation_cases.json`) was authored by the same person who designed the synthetic seed
+claims — **that's disclosed here rather than presented as independent benchmarking**; for 18 synthetic
+claims, the honest value is in surfacing disagreements, not producing an impressive-looking score.
+
+```
+python evaluation/evaluate.py
+```
+
+Latest run ([full output](evaluation/RESULTS.md)):
+
+| Metric | Result |
+|---|---|
+| Structured output validity | **18/18 (100%)** |
+| Risk-tier exact agreement | **16/18 (88.9%)** |
+| Fraud-ring true positives | **6/6** |
+| Fraud-ring false positives | **0** |
+| Fraud-ring false negatives | **0** |
+
+The two tier disagreements (`CLM-1009`, `CLM-1014`) were both the model rating a claim **Medium** where the
+claim was designed to be **High** — an under-call, not a dangerous over- or under-classification in the
+opposite direction (nothing designed as High dropped to Low, and nothing designed as Low was bumped up).
+Both are reported in [`evaluation/RESULTS.md`](evaluation/RESULTS.md) rather than hidden. The ring
+detection correctly identified all six real ring members and, notably, did **not** flag the `CLM-1008`
+/ `CLM-1013` shared-address trap case as a ring — the disagreements a reviewer should be checking for.
 
 ## Setup
 
@@ -106,18 +292,6 @@ Live features (the "Run live AI analysis" buttons, **Submit a New Claim**, and *
 require a valid `GEMINI_API_KEY`; without one, the sidebar shows a warning and those actions display a
 friendly error instead of crashing.
 
-## Testing
-
-```
-pip install -r requirements-dev.txt
-python -m pytest tests/
-```
-
-27 tests cover claim/cache/assessment persistence (`fraudshield/data.py`), UI formatting helpers
-(`fraudshield/ui.py`), and the Gemini client's retry/backoff behavior on rate limits (429) and server
-overload (503) plus response validation (`fraudshield/ai_client.py`) — all against a mocked client, no
-real API calls or network access needed to run the suite.
-
 ## Suggested demo flow
 
 1. **Home** — business framing: the problem, how the pipeline works, illustrative impact.
@@ -137,13 +311,37 @@ This is an MVP built for a one-day capstone, not a production underwriting syste
 - Risk scores are decision-support signals for a human adjuster, not automated denials or approvals.
 - The business-impact figures on the Home page are **illustrative** industry-benchmark estimates, not
   measured results from a production deployment.
-- A real deployment would need: integration with a real claims/policy system, document and photo
-  verification, an audit trail and human-review workflow, bias/fairness testing across protected classes,
-  and a proper database instead of flat JSON files.
+- The [evaluation](#engineering-quality-testing--evaluation) ground truth is self-authored against a
+  synthetic dataset, not an independently labeled benchmark — treat it as a sanity check, not proof of
+  production-grade accuracy.
 
-## Roadmap (beyond this MVP)
+## From MVP to production
 
-- Photo/document analysis (e.g., damage photos vs. claimed repair scope) using the model's vision input.
-- A real fraud-indicator rules layer feeding structured signals into the prompt alongside the narrative.
-- Case management integration (assign to an SIU investigator, track outcomes, feed back into prompts).
-- Persistent storage (a real database) and authentication/roles (adjuster vs. SIU vs. admin).
+```mermaid
+flowchart TD
+    U[Web / Customer Portal] --> API[API Layer + AuthN/AuthZ]
+    API --> DB[(Claims Database)]
+    API --> ORCH[AI Orchestrator]
+    ORCH --> GW[LLM Gateway<br/>prompt/version management]
+    ORCH --> RULES[Deterministic Rules Engine]
+    GW --> RA[Risk Assessment]
+    RULES --> RA
+    RA --> AUDIT[(Audit Trail)]
+    RA --> HUMAN[Human / SIU Review]
+    HUMAN --> EVAL[Evaluation & Monitoring Pipeline]
+    EVAL --> GW
+```
+
+Concretely, moving beyond this MVP would need:
+
+- **Persistent storage** — a real database instead of flat JSON files, with claim history and case status.
+- **AuthN/AuthZ** — role-based access (adjuster vs. SIU vs. admin), not an open Streamlit app.
+- **Audit trail** — every AI recommendation and human decision logged and reviewable, not just displayed.
+- **Model monitoring & evaluation pipeline** — the `evaluation/` harness here is a starting shape, not a
+  finished one; production needs continuous evaluation against real (labeled) outcomes, drift detection,
+  and prompt/version management as the model or prompts change.
+- **Fairness/bias evaluation** — testing for disparate impact across protected classes before any
+  AI-influenced signal reaches a real claims decision.
+- **Document/image analysis** — damage photos vs. claimed repair scope, using the model's vision input.
+- **Case management integration** — assigning flagged claims to an SIU investigator and feeding outcomes
+  back into the evaluation loop, closing the loop this MVP currently leaves open.
